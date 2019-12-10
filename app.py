@@ -43,6 +43,33 @@ usando la función `groupby()` y `count()`.
 
 print(df.groupby('Género').count()['Persona'])
 
+"""
+Podemos agrupar por otras categorías simplemente cambiando el parámetro
+por sobre el cual estamos agrupando.
+"""
+
+print(df.groupby('Carrera').count()['Persona'])
+
+"""
+Rápidamente nos damos cuenta de que nuestros datos no son perfectos (ya que
+han sido ingresados por humanos). Hay varios casos en donde el nombre de la
+carrera ha sido ingresado de formas distintas...
+"""
+
+print(df.groupby('Carrera').count().index)
+
+"""
+Hay nombres de carrera con un espacio al final y sin un espacio al final, lo
+cual hace que nuestras carreras se agrupen inadecuadamente. Para esto, tenemos
+que reparar nuestro dataset, podemos hacerlo de forma manual, o en el código.
+
+Preferimos usar una expresión regular para seleccionar todas las carreras que
+tenían un espacio al final y lo reemplazamos por nada.
+"""
+
+df['Carrera'] = df['Carrera'].str.replace(r'(\s)$', '', regex=True)
+print(df.groupby('Carrera').count().index)
+
 app = dash.Dash(__name__)
 
 app.layout = html.Div()
