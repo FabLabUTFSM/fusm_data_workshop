@@ -38,17 +38,17 @@ print(df[['Persona', 'Género']])
 
 """
 Habiendo creado la categoría, ahora podemos contar la frecuencia de esta
-usando la función `groupby()` y `count()`.
+usando la función `value_counts()`.
 """
 
-print(df.groupby('Género').count()['Persona'])
+print(df['Género'].value_counts())
 
 """
 Podemos agrupar por otras categorías simplemente cambiando el parámetro
 por sobre el cual estamos agrupando.
 """
 
-print(df.groupby('Carrera').count()['Persona'])
+print(df['Carrera'].value_counts())
 
 """
 Rápidamente nos damos cuenta de que nuestros datos no son perfectos (ya que
@@ -56,7 +56,7 @@ han sido ingresados por humanos). Hay varios casos en donde el nombre de la
 carrera ha sido ingresado de formas distintas...
 """
 
-print(df.groupby('Carrera').count().index)
+print(df['Carrera'].value_counts().index)
 
 """
 Hay nombres de carrera con un espacio al final y sin un espacio al final, lo
@@ -68,33 +68,7 @@ tenían un espacio al final y lo reemplazamos por nada.
 """
 
 df['Carrera'] = df['Carrera'].str.replace(r'(\s)$', '', regex=True)
-print(df.groupby('Carrera').count().index)
-
-"""
-Esta función tiene partes móviles que podrían ser adaptadas para convertirla
-en una función general, por lo que escribiremos una función que pueda
-entregarnos el conteo de personas en cualquier columna.
-"""
-
-def contar_por_columna(df, nombre_columna):
-    # Nos aseguramos de estar trabajando con una categoría válida
-    if (nombre_columna not in df.columns):
-        raise ValueError('El nombre de la columna no existe en los datos')
-    # Queremos una función general así que en vez de usar Persona para el
-    # conteo, usamos la primera columna del dataframe, excepto cuando esta
-    # coincide con el nombre por el que agrupamos
-    if (nombre_columna is df.columns[0]):
-        raise ValueError('La columna elegida no es válida')
-    return df.groupby(nombre_columna).count()[df.columns[0]]
-
-"""
-De aquí en adelante podemos usar esta función para obtener el conteo de
-frecuencia en cualquier columna por la que podamos agrupar:
-"""
-
-print(contar_por_columna(df, 'Género'))
-print(contar_por_columna(df, 'Carrera'))
-print(contar_por_columna(df, 'Actividad'))
+print(df['Carrera'].value_counts().index)
 
 """
 Este proceso tiene un problema: no cuenta aquellas entradas que están vacías.
@@ -102,7 +76,7 @@ Para ello, hay que modificar el dataframe que se le entrega a la función, para
 llenar los espacios vacíos con una categoría común, usando el método `fillna()`:
 """
 
-print(contar_por_columna(df.fillna('Desconocido'), 'Carrera'))
+print(df.fillna('Desconocido')['Carrera'].value_counts())
 
 
 app = dash.Dash(__name__)
