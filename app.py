@@ -76,12 +76,59 @@ Para ello, hay que modificar el dataframe que se le entrega a la función, para
 llenar los espacios vacíos con una categoría común, usando el método `fillna()`:
 """
 
-print(df.fillna('Desconocido')['Carrera'].value_counts())
+print(df['Carrera'].fillna('Desconocido').value_counts())
 
+"""
+Luego de que tenemos las categorías contadas podemos empezar a ponerlas en un
+gráfico, para lo que utilizaremos la librería 'plotly', y para mostrar este
+gráfico en la pantalla, usaremos 'dash'.
+"""
+
+import plotly.graph_objects as go
+import dash_core_components as dcc
+
+"""
+Lo prmero que tenemos que hacer es crear una figura, una figura es el
+descriptor de un gráfico, que contiene toda su configuración.
+"""
+
+generos = df['Género'].value_counts()
+torta = go.Pie(values=generos, labels=generos.index)
+figura = go.Figure(data=[torta])
+
+"""
+Con nuestra figura lista, ahora podemos crear un gráfico. El gráfico controla
+cómo se ve nuestra figura en la pantalla.
+"""
+
+grafico_generos = dcc.Graph(figure=figura)
+
+"""
+Finalmente, para incorporar el gráfico a la página, lo agregamos a la lista de
+hijos de la estructura de nuestra página.
+"""
+hijos = [grafico_generos]
+
+"""
+Podemos escribir una función general que genere estos gráficos por nosotros,
+que tome una serie y devuelva un gráfico.
+"""
+
+def crear_torta(serie_con_categorias, titulo=None):
+    valores = serie_con_categorias.fillna('Desconocido').value_counts()
+    torta = go.Pie(values=valores, labels=valores.index, title=valores.name if not titulo else titulo)
+    figura = go.Figure(data=[torta])
+    return dcc.Graph(figure=figura)
+
+"""
+y luego podemos usar esta figura para crear todos los otros gráficos
+"""
+
+hijos.append(crear_torta(df['Carrera']))
+hijos.append(crear_torta(df['Actividad']))
 
 app = dash.Dash(__name__)
-
-app.layout = html.Div()
+app.layout = html.Div(hijos)
 
 if __name__ == "__main__":
     app.run_server(debug=True)
